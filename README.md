@@ -3,3 +3,5 @@
 #然后登陆  admin/admin123
 #配置docker 镜像库即可使用.
 #2019.04.23 开心
+
+具体配置过程可参考:https://blog.csdn.net/happyfreeangel/article/details/89481720
