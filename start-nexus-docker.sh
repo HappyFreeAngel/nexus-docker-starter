@@ -163,9 +163,9 @@ do
           sleep 5
           max_wait_time_in_seconds=$((max_wait_time_in_seconds-5))
     else
-          echo "nexus启动成功"
+          echo "nexus docker 启动成功"
           keytool -printcert -sslserver ${NEXUS_DOMAIN}:${HTTPS_PORT} -rfc > ${NEXUS_DOMAIN}.crt
-          cert_result=$(cat ${NEXUS_DOMAIN}.crt | grep '-----BEGIN CERTIFICATE-----')
+          cert_result=$( cat ${NEXUS_DOMAIN}.crt | grep 'BEGIN CERTIFICATE')
 
           ##下面这行代码有问题.
           ##keytool -export -alias ${KEYSTORE_ALIAS} -keystore keystore.jks -storepass ${STORE_PASS} -file ${NEXUS_DOMAIN}.crt  ##??
