@@ -5,8 +5,8 @@ cd ${current_file_path}
 
 #输入参数如下
 export NIC_NAME="ens160"
-export NEXUS_IP_ADDRESS=""
-export NEXUS_DOMAIN=nexus.cityworks.cn
+export NEXUS_IP_ADDRESS="" #这个IP地址必须填写.
+export NEXUS_DOMAIN=nexus.example.com
 
 export KEY_STORE_PASSWORD=your_password
 export KEY_PASSWORD=your_password
@@ -96,8 +96,6 @@ application-port=8081
 application-host=0.0.0.0
 
 application-port-ssl=8443
-
-#下面代码有问题，to do ???? 无法写入文件.
 nexus-args=${temp_jetty_path}/jetty.xml,${temp_jetty_path}/jetty-http.xml,${temp_jetty_path}/jetty-requestlog.xml,${temp_jetty_path}/jetty-https.xml,${temp_jetty_path}/jetty-http-redirect-to-https.xml
 
 #nexus-args=${temp_jetty_path}/jetty.xml,${temp_jetty_path}/jetty-http.xml,${temp_jetty_path}/jetty-requestlog.xml
@@ -156,7 +154,7 @@ ${NEXUS_IMAGE_NAME}
 echo "等待服务器启动..."
 echo "准备导出自签名证书,给Nexus docker客户端服务器使用(如mesos-agent),请您耐心等待服务器启动,大概30秒左右"
 
-max_wait_time_in_seconds=240 #最多等待240秒
+max_wait_time_in_seconds=360 #最多等待360秒
 while [ $max_wait_time_in_seconds -gt 0 ]
 do
     result=$(docker logs nexus | grep 'Start RESTORE')
@@ -167,19 +165,23 @@ do
     else
           echo "nexus启动成功"
           keytool -printcert -sslserver ${NEXUS_DOMAIN}:${HTTPS_PORT} -rfc > ${NEXUS_DOMAIN}.crt
-          more ${NEXUS_DOMAIN}.crt
+          cert_result=$(cat ${NEXUS_DOMAIN}.crt | grep '-----BEGIN CERTIFICATE-----')
 
           ##下面这行代码有问题.
           ##keytool -export -alias ${KEYSTORE_ALIAS} -keystore keystore.jks -storepass ${STORE_PASS} -file ${NEXUS_DOMAIN}.crt  ##??
 
-          cp $NEXUS_DOMAIN.crt   /etc/pki/ca-trust/source/anchors/${NEXUS_DOMAIN}.crt
-          update-ca-trust
+          if [[ ! -z "$cert_result" ]];
+          then
+              echo "证书${NEXUS_DOMAIN}.crt生成成功."
+              cp $NEXUS_DOMAIN.crt   /etc/pki/ca-trust/source/anchors/${NEXUS_DOMAIN}.crt
+              update-ca-trust
 
-          echo " 请将证书文件${NEXUS_DOMAIN}.crt拷贝到所有需要推送拉取镜像的机器上,位置是:/etc/docker/certs.d/${NEXUS_DOMAIN}\:${DOCKER_PRIVATE_HTTPS_PORT}/${NEXUS_DOMAIN}.crt"
-          echo " 请将证书文件${NEXUS_DOMAIN}.crt拷贝到所有需要推送拉取镜像的机器上,位置是:/etc/docker/certs.d/${NEXUS_DOMAIN}\:${DOCKER_GROUP_HTTPS_PORT}/${NEXUS_DOMAIN}.crt"
-          echo " 然后就可以在远程机器上使用 1: docker login ${NEXUS_DOMAIN}:${DOCKER_GROUP_HTTPS_PORT} 拉取镜像了。"
-          echo " 然后就可以在远程机器上使用 1: docker login ${NEXUS_DOMAIN}:${DOCKER_PRIVATE_HTTPS_PORT} 推送镜像了。"
+              echo " 请将证书文件${NEXUS_DOMAIN}.crt拷贝到所有需要推送拉取镜像的机器上,位置是:/etc/docker/certs.d/${NEXUS_DOMAIN}\:${DOCKER_PRIVATE_HTTPS_PORT}/${NEXUS_DOMAIN}.crt"
+              echo " 请将证书文件${NEXUS_DOMAIN}.crt拷贝到所有需要推送拉取镜像的机器上,位置是:/etc/docker/certs.d/${NEXUS_DOMAIN}\:${DOCKER_GROUP_HTTPS_PORT}/${NEXUS_DOMAIN}.crt"
+              echo " 然后就可以在远程机器上使用 1: docker login ${NEXUS_DOMAIN}:${DOCKER_GROUP_HTTPS_PORT} 拉取镜像了。"
+              echo " 然后就可以在远程机器上使用 1: docker login ${NEXUS_DOMAIN}:${DOCKER_PRIVATE_HTTPS_PORT} 推送镜像了。"
 
-          break
+              break
+          fi
     fi
 done
