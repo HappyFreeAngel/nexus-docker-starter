@@ -1,0 +1,8 @@
+[kubernetesrepo]
+name=Kubernetes
+baseurl=https://nexus.linkaixin.com:8443/repository/yum-hosted/x86_64/7/kubernetes/
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+#gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+#        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg

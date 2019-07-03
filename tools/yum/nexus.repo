@@ -1,0 +1,8 @@
+
+[nexusrepo]
+name=Nexus Repository
+baseurl=https://nexus.linkaixin.com:8443/repository/yum-proxy/$releasever/os/$basearch/
+enabled=1
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+priority=1

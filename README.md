@@ -5,3 +5,10 @@
 #2019.04.23 开心
 
 具体配置过程可参考:https://blog.csdn.net/happyfreeangel/article/details/89481720
+
+
+已经成功验证过: docker 镜像库创建
+              yum 镜像库
+              maven 镜像库
+
+              
